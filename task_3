@@ -1,0 +1,82 @@
+"""task 3"""
+import numpy as np
+from itertools import product
+
+def split_2(intervals):
+    return chek_pair(np.split(np.array(intervals), len((intervals))/2), np.split(np.array(intervals), len((intervals))/2))
+
+
+def chek_pair(intervals, new_int):
+    l = len(intervals)
+    for i in range(l):
+        for j in range(i, l):
+            if (intervals[j][0] <= intervals[i][1]) and (intervals[j] != intervals[i]).any():
+                if intervals[j][1] <= intervals[i][1]:
+                    for t in range(len(new_int)):
+                        if (new_int[t] == intervals[j]).all():
+                            del new_int[t]
+                            break
+                else:
+                    for t in range(len(new_int)):
+                        if (new_int[t] == intervals[j]).all():
+                            new_int[t][0] = intervals[i][0]
+                    for t in range(len(new_int)):
+                        if (new_int[t] == intervals[i]).all():
+                            del new_int[t]
+                            break
+    return new_int
+
+
+def check_lessson(i, lesson):
+    if i[0] < lesson[0]:
+         i[0] = lesson[0]
+    elif i[1] > lesson[1]:
+        i[1] = lesson[1]
+    return i
+
+
+
+def appearance(intervals):
+    #answer += (s for i in split_2(intervals['tutor']) for j in split_2(intervals['pupil']) if i[])
+    tutor = split_2(intervals['tutor'])
+    pupil = split_2(intervals['pupil'])
+    answer = 0
+    for i, j in product(tutor, pupil):
+        i = check_lessson(i, intervals['lesson'])
+        j = check_lessson(j, intervals['lesson'])
+        if (i[0] <= j[1] and j[0] <= i[1]) or (j[0] <= i[1] and i[0] <= j[1]):
+            if (i[0]>=j[0] and i[1]<=j[1]):
+                s = abs(i[0] - i[1])
+            elif (j[0]>=i[0] and j[1]<=i[1]):
+                s = abs(j[0] - j[1])
+            else:
+                if j[1]>=i[1]:
+                    s = abs(i[1] - j[0])
+                else:
+                    s = abs(i[0] - j[1])
+            answer += s
+    return answer
+
+
+tests = [
+    {'data': {'lesson': [1594663200, 1594666800],
+             'pupil': [1594663340, 1594663389, 1594663390, 1594663395, 1594663396, 1594666472],
+             'tutor': [1594663290, 1594663430, 1594663443, 1594666473]},
+     'answer': 3117
+   },
+    {'data': {'lesson': [1594702800, 1594706400],
+             'pupil': [1594702789, 1594704500, 1594702807, 1594704542, 1594704512, 1594704513, 1594704564, 1594705150, 1594704581, 1594704582, 1594704734, 1594705009, 1594705095, 1594705096, 1594705106, 1594706480, 1594705158, 1594705773, 1594705849, 1594706480, 1594706500, 1594706875, 1594706502, 1594706503, 1594706524, 1594706524, 1594706579, 1594706641],
+             'tutor': [1594700035, 1594700364, 1594702749, 1594705148, 1594705149, 1594706463]},
+    'answer': 3577
+    },
+    {'data': {'lesson': [1594692000, 1594695600],
+             'pupil': [1594692033, 1594696347],
+             'tutor': [1594692017, 1594692066, 1594692068, 1594696341]},
+    'answer': 3565
+    },
+]
+
+if __name__ == '__main__':
+   for i, test in enumerate(tests):
+       test_answer = appearance(test['data'])
+       assert test_answer == test['answer'], f'Error on test case {i}, got {test_answer}, expected {test["answer"]}'
