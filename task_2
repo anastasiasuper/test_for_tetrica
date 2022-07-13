@@ -1,0 +1,43 @@
+"""task 2"""
+import requests
+from bs4 import BeautifulSoup
+
+def task2():
+    a = ord('а')
+    ru_list = dict.fromkeys(list(''.join([chr(i) for i in range(a,a+32)])), 0)
+    key =list(ru_list.keys())
+
+    url = "https://inlnk.ru/jElywR"
+    page = requests.get(url).text
+
+    flag = True
+    check = []
+    while flag:
+        soup = BeautifulSoup(page, 'lxml')
+        names = soup.find('div', id='mw-pages').find_all('a')
+        for name in names:
+            #print(name.text)
+            k = name.text[0].lower()
+            if name.text[0].lower() in key and name.text != 'Следующая страница' and name.text != 'Предыдущая страница':
+                old = ru_list[name.text[0].lower()]
+                ru_list[name.text[0].lower()] = old + 1
+                #print(ru_list)
+            if name.text[0].lower() not in key:
+                check.append(name.text[0].lower())
+                if len(check)>3:
+                    flag = False
+
+        links = soup.find('div', id='mw-pages').find_all('a')
+
+        for a in links:
+            if a.text == 'Следующая страница':
+                url = 'https://ru.wikipedia.org/' + a.get('href')
+                page = requests.get(url).text
+
+
+        #if ru_list == {'а': 1147, 'б': 1600, 'в': 515, 'г': 984, 'д': 739, 'е': 99, 'ж': 392, 'з': 620, 'и': 337, 'й': 3, 'к': 2185, 'л': 679, 'м': 1240, 'н': 451, 'о': 766, 'п': 1730, 'р': 555, 'с': 1737, 'т': 968, 'у': 242, 'ф': 189, 'х': 270, 'ц': 218, 'ч': 658, 'ш': 267, 'щ': 146, 'ъ': 0, 'ы': 0, 'ь': 0, 'э': 213, 'ю': 133, 'я': 209}:
+            #print(ru_list)
+    return ru_list
+
+
+print(task2())
