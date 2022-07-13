@@ -1,0 +1,15 @@
+"""task 1"""
+def task1(a):
+    for i in a:
+        if i == '0' or i == 0:
+            return a.index(i)
+
+#более короткий вариант если рассмтриваем массив как строку
+def task1_1(a, b):
+    if type(a) == str:
+        return a.find(str(b))
+    #elif type(a) == list:
+    #    return a.index(str(b))
+
+print(task1_1(list('1110000'), 0))
+
